@@ -29,23 +29,89 @@ URL until it expires (7/30/90 days, chosen at share time).
 - `GET /:userShortId/:recipeSlug` — public, serves the stored HTML
 - `DELETE /:userShortId/:recipeSlug` — requires `{ token }` in the body
 
-## Setup
+## Quick start
+
+Everything below gets you from a fresh clone to a live URL you can
+paste into Recipe Box's `shareServerUrl` setting.
+
+### 1. Install dependencies
 
 ```bash
 npm install
+```
+
+### 2. Configure your KV namespace
+
+```bash
 cp wrangler.toml.sample wrangler.toml
-wrangler kv:namespace create SHARES
-wrangler kv:namespace create SHARES --preview
-# paste both returned ids into your local wrangler.toml (it's gitignored,
-# your ids never get committed)
+npx wrangler kv:namespace create SHARES
+npx wrangler kv:namespace create SHARES --preview
+```
+
+Each command prints an `id`. Paste them into your local `wrangler.toml`
+(it's gitignored, your ids never get committed):
+
+```toml
+[[kv_namespaces]]
+binding = "SHARES"
+id = "paste-the-first-id-here"
+preview_id = "paste-the-preview-id-here"
+```
+
+### 3. Run it locally (optional, for testing)
+
+```bash
 npm run dev
 ```
 
-## Deploy
+Starts a local dev server and prints a `localhost` URL you can hit with
+curl to sanity-check the three endpoints before deploying anywhere
+public.
+
+### 4. Authenticate with Cloudflare
+
+```bash
+npx wrangler login
+```
+
+Opens a browser to authorize this machine against your Cloudflare
+account. Requires a free Cloudflare account if you don't already have
+one.
+
+### 5. Deploy
 
 ```bash
 npm run deploy
 ```
+
+This publishes the Worker and prints a live URL on Cloudflare's free
+default subdomain:
+
+```
+https://recipebox-share-worker.<your-subaccount>.workers.dev
+```
+
+**This URL works immediately** — no domain purchase needed. Paste it
+into Recipe Box's `shareServerUrl` setting and sharing is fully
+functional at this point. Everything below is optional polish.
+
+### 6. (Optional) Attach a custom domain
+
+Only needed if you want share links to read
+`recipes.yourdomain.com/abc123/banana-bread` instead of the
+`workers.dev` URL. Purely cosmetic, has no effect on functionality.
+
+1. Own a domain (buy one via Cloudflare Registrar, Namecheap, or
+   anywhere else).
+2. That domain's DNS must be managed by Cloudflare. If it's registered
+   elsewhere, add it as a "site" in the Cloudflare dashboard and update
+   your registrar's nameservers to point to Cloudflare. This is a
+   one-time change; propagation can take minutes to a few hours.
+3. In the Cloudflare dashboard: **Workers & Pages → this worker →
+   Settings → Domains & Routes → Add Custom Domain.** Pick a subdomain
+   (e.g. `share.yourdomain.com`). Cloudflare handles routing and the
+   TLS certificate automatically.
+4. Update `shareServerUrl` in Recipe Box's settings to the new domain.
 
 ## Notes
 
