@@ -1,0 +1,19 @@
+name = "recipebox-share-worker"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+
+# KV namespace storing shared recipe HTML, keyed by "{userShortId}/{recipeSlug}".
+#
+# Setup:
+#   cp wrangler.toml.sample wrangler.toml
+#   wrangler kv:namespace create SHARES
+#   wrangler kv:namespace create SHARES --preview
+#   paste the returned ids below into your local wrangler.toml (not this file)
+[[kv_namespaces]]
+binding = "SHARES"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+preview_id = "REPLACE_WITH_PREVIEW_KV_NAMESPACE_ID"
+
+[vars]
+# Bytes. Requests with a larger "html" payload are rejected with 413.
+MAX_HTML_BYTES = "500000"
