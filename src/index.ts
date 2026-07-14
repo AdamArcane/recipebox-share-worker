@@ -7,6 +7,7 @@
 import { handleCreateShare } from './handlers/create-share'
 import { handleDeleteShare } from './handlers/delete-share'
 import { handleGetShare } from './handlers/get-share'
+import { handleGetImage } from './handlers/get-image'
 import type { Env } from './types'
 
 export default {
@@ -16,6 +17,12 @@ export default {
 
     if (request.method === 'POST' && url.pathname === '/share') {
       return handleCreateShare(request, env)
+    }
+
+    // GET /:userShortId/:recipeSlug/image -- served separately from the HTML page
+    if (segments.length === 3 && segments[2] === 'image' && request.method === 'GET') {
+      const [userShortId, recipeSlug] = segments as [string, string, string]
+      return handleGetImage(env, userShortId, recipeSlug)
     }
 
     // Both GET and DELETE operate on /:userShortId/:recipeSlug

@@ -6,7 +6,7 @@
  * accounts, so token possession is the only proof of ownership.
  */
 
-import { deleteShare, getShare } from '../kv'
+import { deleteShare, deleteImage, getShare } from '../kv'
 import type { DeleteShareRequest, Env } from '../types'
 
 export async function handleDeleteShare(
@@ -35,6 +35,11 @@ export async function handleDeleteShare(
     return new Response(null, { status: 403 })
   }
 
-  await deleteShare(env, userShortId, recipeSlug)
+  // Delete both keys -- image key may not exist for shares without images,
+  // deleteImage is a no-op in that case.
+  await Promise.all([
+    deleteShare(env, userShortId, recipeSlug),
+    deleteImage(env, userShortId, recipeSlug),
+  ])
   return new Response(null, { status: 204 })
 }

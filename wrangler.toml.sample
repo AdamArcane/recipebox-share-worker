@@ -17,3 +17,7 @@ preview_id = "REPLACE_WITH_PREVIEW_KV_NAMESPACE_ID"
 [vars]
 # Bytes. Requests with a larger "html" payload are rejected with 413.
 MAX_HTML_BYTES = "500000"
+# Bytes. Requests with a larger decoded image payload are rejected with 413.
+# The plugin enforces a 350 KB budget before sending; this is a server-side
+# safety net. Default is 500 KB if this var is absent or non-numeric.
+MAX_IMAGE_BYTES = "512000"

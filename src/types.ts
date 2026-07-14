@@ -5,6 +5,8 @@
 export interface Env {
   SHARES: KVNamespace
   MAX_HTML_BYTES: string
+  /** Hard cap on image bytes (after base64 decode). Defaults to 500 KB if unset. */
+  MAX_IMAGE_BYTES: string
 }
 
 /** Allowed expiry windows, enforced server-side regardless of client input. */
@@ -16,6 +18,11 @@ export interface CreateShareRequest {
   name: string
   html: string
   expiresInDays: number
+  /** Base64-encoded image bytes for vault-local images. When present the Worker
+   * stores them at {userShortId}/{recipeSlug}/image and replaces every occurrence
+   * of __RB_IMAGE_URL__ in `html` with the resulting public URL. */
+  imageBase64?: string
+  imageContentType?: string
 }
 
 export interface CreateShareResponse {
